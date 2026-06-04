@@ -1,0 +1,50 @@
+# 主配置 — 当前最优，直接用于正式训练
+# 蓝本：mst_v2_global_only_merged（三路视觉合并 + 姿态 + Focal Loss）
+# 用法: python src/model/mst/train.py --config configs/main.yaml
+
+# ── 数据 ──────────────────────────────────────────────────────────────────────
+data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 120
+min_seq_len: 60
+reshuffle_augment: true
+train_ratio: 0.8
+num_classes: 5
+class_weights: [1.0, 4.0, 5.0, 4.0, 1.5]
+
+# ── 模型架构 ───────────────────────────────────────────────────────────────────
+use_visual: true
+use_player_crops: true
+use_pose: true
+use_pos_encoding: false          # 关闭位置编码，避免模型依赖绝对位置
+visual_backbone: "yolo11"
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true        # 三路 cat 后过 shared_resampler → 16 token/帧
+parallel_backbones: false
+
+# ── 模型超参 ───────────────────────────────────────────────────────────────────
+embed_dim: 128
+depth: 8
+num_heads: 4
+dropout: 0.3
+
+# ── 训练 ───────────────────────────────────────────────────────────────────────
+batch_size: 2
+virtual_batch_size: 64
+total_epochs: 100
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "focal"
+focal_gamma: 2.0
+keyframe_loss_weight: 0.5
+
+# ── 硬件 ───────────────────────────────────────────────────────────────────────
+num_workers: 2
+pin_memory: true
+transformer_checkpoint: true

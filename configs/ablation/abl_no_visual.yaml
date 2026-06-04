@@ -1,0 +1,44 @@
+﻿# 消融实验：纯姿态（use_visual=false，无视觉流）
+# 对比 main.yaml，量化视觉特征的整体贡献
+
+data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 120
+min_seq_len: 60
+reshuffle_augment: true
+train_ratio: 0.8
+num_classes: 5
+class_weights: [1.0, 4.0, 5.0, 4.0, 1.5]
+
+use_visual: false                # ← 变量：关闭所有视觉流
+use_player_crops: false
+use_pose: true
+use_pos_encoding: false
+visual_backbone: "yolo11"
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true
+parallel_backbones: false
+
+embed_dim: 128
+depth: 8
+num_heads: 4
+dropout: 0.3
+
+batch_size: 8                    # 无视觉流显存压力小，batch 可适当调大
+virtual_batch_size: 64
+total_epochs: 40
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "focal"
+focal_gamma: 2.0
+keyframe_loss_weight: 0.5
+
+num_workers: 2
+pin_memory: true
+transformer_checkpoint: true

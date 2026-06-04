@@ -1,0 +1,53 @@
+# ===== 大文件 / 数据集（不纳入版本控制）=====
+# 原始比赛视频、字幕
+videos/
+*.mp4
+*.avi
+*.mkv
+*.ass
+*.srt
+
+# 数据集（标注回合、球场/人员训练数据等）
+data/
+*.zip
+
+# 模型权重
+models/
+*.pt
+*.pth
+*.onnx
+*.engine
+
+# 训练运行记录、日志、结果产出
+runs/
+logs/
+results/
+journal/
+_archive/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# ===== 工具 / 标注产物 =====
+_progress.json
+last_session.json
+annotations.json
+pose_data.json
+tracking_data.json
+
+# ===== 编辑器 / 系统 =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

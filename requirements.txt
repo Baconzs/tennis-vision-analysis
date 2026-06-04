@@ -1,0 +1,27 @@
+# Python >= 3.10 (开发于 3.11 / 3.12)
+# 安装：pip install -r requirements.txt
+# 注意：torch / torchvision 建议按官网指引安装对应 CUDA 版本
+
+# 深度学习
+torch
+torchvision
+ultralytics>=8.3        # YOLO11 / YOLO-pose
+
+# 计算机视觉 / 数值计算
+opencv-python
+numpy
+scipy
+scikit-learn
+
+# 数据处理 / 可视化
+pandas
+matplotlib
+seaborn
+
+# 标注工具与桌面应用
+flask                   # action_annotator 动作标注 Web 应用
+PyQt5                   # demo 桌面可视化应用
+
+# 工具
+tqdm
+PyYAML

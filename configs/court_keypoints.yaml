@@ -1,0 +1,6 @@
+path: E:/共享/毕业设计/项目标注与测试/code/Court_Finetune_Workspace/dataset
+train: train/images
+val: val/images
+names:
+  0: tennis_court
+kpt_shape: [14, 3]
