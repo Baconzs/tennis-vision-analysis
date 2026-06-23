@@ -1,0 +1,53 @@
+# 单帧版本 — 基于 main.yaml，将 seq_len 改为 1，消融时序信息的影响
+# 对比 main.yaml 可知时序上下文对动作识别的重要性
+# 用法: python src/model/mst/train.py --config configs/single_frame/sf_main.yaml
+
+# ── 数据 ──────────────────────────────────────────────────────────────────────
+data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 1                    # 单帧，无时序上下文
+min_seq_len: 1
+reshuffle_augment: false      # 单帧无需 reshuffle，每个帧独立
+train_ratio: 0.8
+num_classes: 5
+class_weights: [1.0, 4.0, 5.0, 4.0, 1.5]
+
+# ── 模型架构 ───────────────────────────────────────────────────────────────────
+use_visual: true
+use_player_crops: true
+use_pose: true
+use_pos_encoding: false
+visual_backbone: "yolo11"
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true
+parallel_backbones: false
+
+# ── 模型超参 ───────────────────────────────────────────────────────────────────
+embed_dim: 128
+depth: 8
+num_heads: 4
+dropout: 0.3
+
+# ── 训练 ───────────────────────────────────────────────────────────────────────
+# seq_len=1 时每帧独立，可以加大 batch_size
+# 原 main.yaml batch_size=2, virtual_batch_size=64 (seq_len=120)
+# 现在每帧计算量约为主配置的 1/8（transformer 部分节省，backbone 不变）
+batch_size: 32
+virtual_batch_size: 64
+total_epochs: 60
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "focal"
+focal_gamma: 2.0
+keyframe_loss_weight: 0.0     # 单帧无关键帧概念，关闭关键帧 loss
+
+# ── 硬件 ───────────────────────────────────────────────────────────────────────
+num_workers: 2
+pin_memory: true
+transformer_checkpoint: true

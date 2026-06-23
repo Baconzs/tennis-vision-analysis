@@ -1,0 +1,52 @@
+# 最优配置 — 基于 main.yaml，depth 从 8 降为 4
+# 推导依据: hp_depth4 实验 depth=4 收敛至 85.07%，与 depth=8 (85.37%) 差距 < 0.3%
+#           参数量减半，训练更快，精度持平
+# 用法: python src/model/mst/train.py --config configs/optimal.yaml
+
+# ── 数据 ──────────────────────────────────────────────────────────────────────
+data_root: "data/rallies_train_trimmed"
+test_data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 120
+min_seq_len: 60
+reshuffle_augment: true
+image_augment: true       # 图像增强：颜色抖动/噪声/模糊/擦除/半透明覆盖
+train_ratio: 0.8
+num_classes: 5
+class_weights: [0.9, 4.0, 5.0, 4.0, 1.5]  # 等待从63.7%→58.0%，权重微降
+
+# ── 模型架构 ───────────────────────────────────────────────────────────────────
+use_visual: true
+use_player_crops: true
+use_pose: true
+use_pos_encoding: false
+visual_backbone: "yolo11"
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true
+parallel_backbones: false
+
+# ── 模型超参 ───────────────────────────────────────────────────────────────────
+embed_dim: 128
+depth: 4                      # depth=4, 比 main.yaml 减半; 实验证明 4 与 8 精度持平
+num_heads: 2                    # 每头维度 128/2=64，长序列下每头容量更大
+dropout: 0.3
+
+# ── 训练 ───────────────────────────────────────────────────────────────────────
+batch_size: 2
+virtual_batch_size: 64
+total_epochs: 100
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "cross_entropy"
+keyframe_loss_weight: 0.5
+
+# ── 硬件 ───────────────────────────────────────────────────────────────────────
+num_workers: 2
+pin_memory: true
+transformer_checkpoint: true

@@ -1,0 +1,51 @@
+# 主配置 — 共享骨干版
+# 相对 main.yaml 的改动：seq_len=60（缩短序列）、embed_dim=256（扩大嵌入）、share_yolo_backbone=true（三路视觉共享同一YOLO骨干）
+# 用法: python src/model/mst/train.py --config configs/main_shared.yaml
+
+# ── 数据 ──────────────────────────────────────────────────────────────────────
+data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 60
+min_seq_len: 30
+reshuffle_augment: true
+train_ratio: 0.8
+num_classes: 5
+class_weights: [1.0, 4.0, 5.0, 4.0, 1.5]
+
+# ── 模型架构 ───────────────────────────────────────────────────────────────────
+use_visual: true
+use_player_crops: true
+use_pose: true
+use_pos_encoding: false
+visual_backbone: "yolo11"
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true
+parallel_backbones: false
+share_yolo_backbone: true            # p1/p2 复用全局骨干，参数量 10.7M → 4.9M
+
+# ── 模型超参 ───────────────────────────────────────────────────────────────────
+embed_dim: 256
+depth: 8
+num_heads: 4
+dropout: 0.3
+
+# ── 训练 ───────────────────────────────────────────────────────────────────────
+batch_size: 2
+virtual_batch_size: 64
+total_epochs: 100
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "focal"
+focal_gamma: 2.0
+keyframe_loss_weight: 0.5
+
+# ── 硬件 ───────────────────────────────────────────────────────────────────────
+num_workers: 4                      # 多进程加载数据，CPU 预处理并行化（原为 2）
+pin_memory: true
+transformer_checkpoint: true

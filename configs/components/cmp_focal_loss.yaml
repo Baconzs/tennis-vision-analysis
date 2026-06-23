@@ -1,0 +1,44 @@
+﻿# 组件对比：Focal Loss（与 main.yaml 相同，作为 loss 对比基准）
+# 对比 cmp_ce_loss.yaml，观察 Focal Loss vs CE 的差异
+
+data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 120
+min_seq_len: 60
+reshuffle_augment: true
+train_ratio: 0.8
+num_classes: 5
+class_weights: [1.0, 4.0, 5.0, 4.0, 1.5]
+
+use_visual: true
+use_player_crops: true
+use_pose: true
+use_pos_encoding: false
+visual_backbone: "yolo11"
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true
+parallel_backbones: false
+
+embed_dim: 128
+depth: 8
+num_heads: 4
+dropout: 0.3
+
+batch_size: 2
+virtual_batch_size: 64
+total_epochs: 40
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "focal"                    # ← 变量：Focal Loss
+focal_gamma: 2.0
+keyframe_loss_weight: 0.5
+
+num_workers: 2
+pin_memory: true
+transformer_checkpoint: true

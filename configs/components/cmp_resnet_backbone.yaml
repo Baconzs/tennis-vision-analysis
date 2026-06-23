@@ -1,0 +1,45 @@
+﻿# 组件对比：ResNet18 骨干（替代 YOLO11，有 ImageNet 预训练）
+# 对比 main.yaml，观察通用视觉预训练 vs 检测专用骨干的差异
+# 每帧 token 数：1(姿态) + 16(ResNet18→resampler) = 17，序列长 120×17=2040
+
+data_root: "data/rallies_train"
+crops_root: "data/rallies_train"
+seq_len: 120
+min_seq_len: 60
+reshuffle_augment: true
+train_ratio: 0.6
+num_classes: 5
+class_weights: [1.0, 4.0, 5.0, 4.0, 1.5]
+
+use_visual: true
+use_player_crops: true
+use_pose: true
+use_pos_encoding: false
+visual_backbone: "resnet18"      # ← 变量：ResNet18（ImageNet 预训练）
+global_backbone_weights: "models/yolo/yolo11n.pt"
+backbone_weights: "models/yolo/yolo11n-pose.pt"
+unfreeze_backbone: true
+multi_scale_levels: [3, 4, 5]
+tokens_per_scale: 4
+visual_tokens: 16
+merge_visual_tokens: true
+parallel_backbones: false
+
+embed_dim: 128
+depth: 8
+num_heads: 4
+dropout: 0.3
+
+batch_size: 1
+virtual_batch_size: 64
+total_epochs: 40
+learning_rate: 1.0e-4
+weight_decay: 0.05
+warmup_epochs: 5
+loss: "focal"
+focal_gamma: 2.0
+keyframe_loss_weight: 0.5
+
+num_workers: 2
+pin_memory: true
+transformer_checkpoint: true
